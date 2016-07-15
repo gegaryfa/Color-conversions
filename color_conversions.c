@@ -124,18 +124,43 @@ void convertXYZtoRGB(float inX, float inY, float inZ, int * outR, int * outG, in
 
 }
 
+float Lab_color_difference( float inL1, float ina1, float  inb1, float inL2, float ina2, float  inb2){
+	return( sqrt( powf(inL1 - inL2, 2.f) + powf(ina1 - ina2, 2.f) + powf(inb1 - inb2, 2.f) ) );
+}
+
+float RGB_color_Lab_difference( int R1, int G1, int B1, int R2, int G2, int B2){
+	float x1=0,y1=0,z1=0;
+	float x2=0,y2=0,z2=0;
+	float l1=0,a1=0,b1=0;
+	float l2=0,a2=0,b2=0;
+
+	convertRGBtoXYZ(R1, G1, B1, &x1, &x1, &z1);
+	convertRGBtoXYZ(R2, G2, B2, &x2, &x2, &z2);
+
+	convertXYZtoLab(x1, y1, z1, &l1, &a1, &b1);
+	convertXYZtoLab(x2, y2, z2, &l2, &a2, &b2); 
+
+	return( Lab_color_difference(l1 ,a1 ,b1 ,l2 ,a2 ,b2) );
+}
+
 
 void main(int argc, char const *argv[])
 {
-	int R=0,G=0,B=0;
+	int R1,G1,B1,R2,G2,B2;
 	float x=0.f,y=0.f,z=0.f;
 	float l=0.f,a=0.f,b=0.f;
 
-	R = 20;
-	G = 32;
-	B = 60; 
+	R1 = 200;
+	G1 = 2;
+	B1 = 50; 
 
-	convertRGBtoXYZ(R, G, B, &x, &y, &z);
+	R2 = 200;
+	G2 = 2;
+	B2 = 70; 
+
+	printf("LAB DISTANCE = %lf \n", RGB_color_Lab_difference(R1,G1,B1,R2,G2,B2) );
+
+	/*convertRGBtoXYZ(R, G, B, &x, &y, &z);
 	printf("R =%d,G =%d,B =%d,x =%lf,y =%lf,z =%lf\n",R,G,B,x,y,z );
 
 	convertXYZtoLab(x, y, z, &l, &a, &b);
@@ -145,6 +170,6 @@ void main(int argc, char const *argv[])
 	printf("x =%lf,y =%lf,z =%lf, l =%lf,a =%lf,b =%lf\n",x,y,z, l,a,b );
 
 	convertXYZtoRGB( x, y, z,&R, &G, &B);
-	printf("R =%d,G =%d,B =%d,x =%lf,y =%lf,z =%lf\n",R,G,B,x,y,z );
+	printf("R =%d,G =%d,B =%d,x =%lf,y =%lf,z =%lf\n",R,G,B,x,y,z );*/
 
 }

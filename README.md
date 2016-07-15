@@ -1,3 +1,6 @@
-# Color-conversions
+# Color-conversion and difference functions in C
 
-rgb->xyz->Lab->xyz->rgb 
+rgb->xyz
+xyz->Lab
+Lab->xyz
+xyz->rgb 
