@@ -6,7 +6,17 @@ float ref_X = 95.047;
 float ref_Y = 100.0;
 float ref_Z = 108.883;
 
-
+/***************************************************
+ *  Name:        convertRGBtoXYZ
+ *
+ *  Returns:     Nothing
+ *
+ *  Parameters:  RGB values and XYZ references
+ *
+ *  Description: Given a color in RGB values converts  
+ *               to the corresponding XYZ values
+ *
+ ***************************************************/
 void convertRGBtoXYZ(int inR, int inG, int inB, float * outX, float * outY, float * outZ) {
 
 
@@ -39,6 +49,18 @@ void convertRGBtoXYZ(int inR, int inG, int inB, float * outX, float * outY, floa
 	*outZ = var_R * 0.0193f + var_G * 0.1192f + var_B * 0.9505f;
 }
 
+
+/***************************************************
+ *  Name:        convertXYZtoLab
+ *
+ *  Returns:     Nothing
+ *
+ *  Parameters:  XYZ values and Lab references
+ *
+ *  Description: Given a color in XYZ values converts  
+ *               to the corresponding Lab values
+ *
+ ***************************************************/
 void convertXYZtoLab(float inX, float inY, float inZ, float * outL, float * outa, float * outb) {
 
 	float var_X = (inX / ref_X); //ref_X = 95.047
@@ -65,6 +87,18 @@ void convertXYZtoLab(float inX, float inY, float inZ, float * outL, float * outa
 	*outb = 200 * ( var_Y - var_Z );
 }
 
+
+/***************************************************
+ *  Name:        convertLabtoXYZ
+ *
+ *  Returns:     Nothing
+ *
+ *  Parameters:  Lab values and XYZ references
+ *
+ *  Description: Given a color in Lab values converts  
+ *               to the corresponding XYZ values
+ *
+ ***************************************************/
 void convertLabtoXYZ( float inL, float ina, float  inb, float * outX, float * outY, float * outZ) {
 
 	float var_Y = ( inL + 16 ) / 116;
@@ -91,6 +125,17 @@ void convertLabtoXYZ( float inL, float ina, float  inb, float * outX, float * ou
 	*outZ = ref_Z * var_Z;     //ref_Z = 108.883
 }
 
+/***************************************************
+ *  Name:        convertXYZtoRGB
+ *
+ *  Returns:     Nothing
+ *
+ *  Parameters:  XYZ values and RGB references
+ *
+ *  Description: Given a color in XYZ values converts  
+ *               to the corresponding RGB values
+ *
+ ***************************************************/
 void convertXYZtoRGB(float inX, float inY, float inZ, int * outR, int * outG, int * outB) {
 
 
@@ -124,11 +169,34 @@ void convertXYZtoRGB(float inX, float inY, float inZ, int * outR, int * outG, in
 
 }
 
-float Lab_color_difference( float inL1, float ina1, float  inb1, float inL2, float ina2, float  inb2){
-	return( sqrt( powf(inL1 - inL2, 2.f) + powf(ina1 - ina2, 2.f) + powf(inb1 - inb2, 2.f) ) );
+/***************************************************
+ *  Name:        Lab_color_difference_CIE76
+ *
+ *  Returns:     float
+ *
+ *  Parameters:  2 Lab color values
+ *
+ *  Description: Calculates and returns the difference 
+ *				 between 2 Lab colors based on the CIE76 formula
+ *
+ ***************************************************/
+float Lab_color_difference_CIE76( float inL1, float ina1, float  inb1, float inL2, float ina2, float  inb2){
+	return( sqrt( powf(inL1 - inL2, 2.f) + powf(ina1 - ina2, 2.f) + powf(inb1 - inb2, 2.f) ) );//CIE76
 }
 
-float RGB_color_Lab_difference( int R1, int G1, int B1, int R2, int G2, int B2){
+/***************************************************
+ *  Name:        RGB_color_Lab_difference_CIE76
+ *
+ *  Returns:     float
+ *
+ *  Parameters:  2 RGB color values
+ *
+ *  Description: Converts RGB values to Lab values and returns  
+ *				 the difference between 2 Lab colors based on 
+ *				 the CIE76 formula
+ *
+ ***************************************************/
+float RGB_color_Lab_difference_CIE76( int R1, int G1, int B1, int R2, int G2, int B2){
 	float x1=0,y1=0,z1=0;
 	float x2=0,y2=0,z2=0;
 	float l1=0,a1=0,b1=0;
@@ -140,10 +208,96 @@ float RGB_color_Lab_difference( int R1, int G1, int B1, int R2, int G2, int B2){
 	convertXYZtoLab(x1, y1, z1, &l1, &a1, &b1);
 	convertXYZtoLab(x2, y2, z2, &l2, &a2, &b2); 
 
-	return( Lab_color_difference(l1 ,a1 ,b1 ,l2 ,a2 ,b2) );
+	return( Lab_color_difference_CIE76(l1 ,a1 ,b1 ,l2 ,a2 ,b2) );
+}
+
+/***************************************************
+ *  Name:        Lab_color_difference_CIE94
+ *
+ *  Returns:     float
+ *
+ *  Parameters:  2 Lab color values
+ *
+ *  Description: Calculates and returns the difference 
+ *				 between 2 Lab colors based on the CIE94 formula
+ *
+ ***************************************************/
+float Lab_color_difference_CIE94( float inL1, float ina1, float  inb1, float inL2, float ina2, float  inb2){
+	// case Application.GraphicArts:
+		float Kl = 1.0;
+		float K1 = 0.045;
+		float K2 = 0.015;
+	// 	break;
+	// case Application.Textiles:
+	// 	Kl = 2.0;
+	// 	K1 = .048;
+	// 	K2 = .014;
+	// break;
+
+	float deltaL = inL1 - inL2;
+	float deltaA = ina1 - ina2;
+	float deltaB = inb1 - inb2;
+
+	float c1 = sqrt(pow(ina1, 2) + pow(inb1, 2));
+	float c2 = sqrt(pow(ina2, 2) + pow(inb2, 2));
+	float deltaC = c1 - c2;
+
+	float deltaH = pow(deltaA,2) + pow(deltaB,2) - pow(deltaC,2);
+	deltaH = deltaH < 0 ? 0 : sqrt(deltaH);
+
+	const float sl = 1.f;
+	const float kc = 1.f;
+	const float kh = 1.f;
+
+	float sc = 1.f + K1*c1;
+	float sh = 1.f + K2*c1;
+
+	float i = pow(deltaL/(Kl*sl), 2) +
+	                pow(deltaC/(kc*sc), 2) +
+	                pow(deltaH/(kh*sh), 2);
+
+	float finalResult = i < 0 ? 0 : sqrt(i);
+	return (finalResult);
+}
+
+/***************************************************
+ *  Name:        RGB_color_Lab_difference_CIE94
+ *
+ *  Returns:     float
+ *
+ *  Parameters:  2 RGB color values
+ *
+ *  Description: Converts RGB values to Lab values and returns  
+ *				 the difference between 2 Lab colors based on 
+ *				 the CIE94 formula
+ *
+ ***************************************************/
+float RGB_color_Lab_difference_CIE94( int R1, int G1, int B1, int R2, int G2, int B2){
+	float x1=0,y1=0,z1=0;
+	float x2=0,y2=0,z2=0;
+	float l1=0,a1=0,b1=0;
+	float l2=0,a2=0,b2=0;
+
+	convertRGBtoXYZ(R1, G1, B1, &x1, &x1, &z1);
+	convertRGBtoXYZ(R2, G2, B2, &x2, &x2, &z2);
+
+	convertXYZtoLab(x1, y1, z1, &l1, &a1, &b1);
+	convertXYZtoLab(x2, y2, z2, &l2, &a2, &b2); 
+
+	return( Lab_color_difference_CIE94(l1 ,a1 ,b1 ,l2 ,a2 ,b2) );
 }
 
 
+/***************************************************
+ *  Name:        main
+ *
+ *  Returns:     Nothing
+ *
+ *  Parameters:  argc, **argv
+ *
+ *  Description: Running some tests
+ *
+ ***************************************************/
 void main(int argc, char const *argv[])
 {
 	int R1,G1,B1,R2,G2,B2;
@@ -158,18 +312,6 @@ void main(int argc, char const *argv[])
 	G2 = 2;
 	B2 = 70; 
 
-	printf("LAB DISTANCE = %lf \n", RGB_color_Lab_difference(R1,G1,B1,R2,G2,B2) );
-
-	/*convertRGBtoXYZ(R, G, B, &x, &y, &z);
-	printf("R =%d,G =%d,B =%d,x =%lf,y =%lf,z =%lf\n",R,G,B,x,y,z );
-
-	convertXYZtoLab(x, y, z, &l, &a, &b);
-	printf("x =%lf,y =%lf,z =%lf, l =%lf,a =%lf,b =%lf\n",x,y,z, l,a,b );
-
-	convertLabtoXYZ( l, a, b ,&x, &y, &z);
-	printf("x =%lf,y =%lf,z =%lf, l =%lf,a =%lf,b =%lf\n",x,y,z, l,a,b );
-
-	convertXYZtoRGB( x, y, z,&R, &G, &B);
-	printf("R =%d,G =%d,B =%d,x =%lf,y =%lf,z =%lf\n",R,G,B,x,y,z );*/
+	printf("LAB DISTANCE = %lf \n", RGB_color_Lab_difference_CIE94(R1,G1,B1,R2,G2,B2) );
 
 }
