@@ -202,8 +202,8 @@ float RGB_color_Lab_difference_CIE76( int R1, int G1, int B1, int R2, int G2, in
 	float l1=0,a1=0,b1=0;
 	float l2=0,a2=0,b2=0;
 
-	convertRGBtoXYZ(R1, G1, B1, &x1, &x1, &z1);
-	convertRGBtoXYZ(R2, G2, B2, &x2, &x2, &z2);
+	convertRGBtoXYZ(R1, G1, B1, &x1, &y1, &z1);
+	convertRGBtoXYZ(R2, G2, B2, &x2, &y2, &z2);
 
 	convertXYZtoLab(x1, y1, z1, &l1, &a1, &b1);
 	convertXYZtoLab(x2, y2, z2, &l2, &a2, &b2); 
@@ -278,8 +278,8 @@ float RGB_color_Lab_difference_CIE94( int R1, int G1, int B1, int R2, int G2, in
 	float l1=0,a1=0,b1=0;
 	float l2=0,a2=0,b2=0;
 
-	convertRGBtoXYZ(R1, G1, B1, &x1, &x1, &z1);
-	convertRGBtoXYZ(R2, G2, B2, &x2, &x2, &z2);
+	convertRGBtoXYZ(R1, G1, B1, &x1, &y1, &z1);
+	convertRGBtoXYZ(R2, G2, B2, &x2, &y2, &z2);
 
 	convertXYZtoLab(x1, y1, z1, &l1, &a1, &b1);
 	convertXYZtoLab(x2, y2, z2, &l2, &a2, &b2); 
